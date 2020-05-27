@@ -26,3 +26,18 @@ function addRandomGreeting() {
   const greetingContainer = document.getElementById('greeting-container');
   greetingContainer.innerText = greeting;
 }
+
+/**
+ * Select a random picture.
+ */
+function randomPicture() {
+    const pictures = ['Landscape1.jpg', 'Landscape2.jpg', 'Landscape3.JPG', 'Landscape4.JPG'];
+
+    const picture = pictures[Math.floor(Math.random() * pictures.length)];
+    console.log(picture);
+
+    const pictureContainer = document.getElementById('landscapeImage');
+    console.log("/images/" + picture);
+    pictureContainer.src = "/images/" + picture;
+    
+}
