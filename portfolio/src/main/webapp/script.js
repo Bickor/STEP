@@ -12,32 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/**
- * Adds a random greeting to the page.
- */
-function addRandomGreeting() {
-  const greetings =
-      ['Hello world!', '¡Hola Mundo!', '你好，世界！', 'Bonjour le monde!'];
-
-  // Pick a random greeting.
-  const greeting = greetings[Math.floor(Math.random() * greetings.length)];
-
-  // Add it to the page.
-  const greetingContainer = document.getElementById('greeting-container');
-  greetingContainer.innerText = greeting;
-}
-
+var currentPicture = 1;
 /**
  * Select a random picture.
  */
 function randomPicture() {
-    const pictures = ['Landscape1.jpg', 'Landscape2.jpg', 'Landscape3.JPG', 'Landscape4.JPG'];
+    const pictures = ["landscape0.jpg", "landscape1.jpg", "landscape2.jpg",
+        "landscape3.JPG", "landscape4.jpg", "landscape5.jpg", "landscape6.jpg",
+        "landscape7.jpg", "landscape8.jpg", "landscape9.jpg"];
 
-    const picture = pictures[Math.floor(Math.random() * pictures.length)];
-    console.log(picture);
+    var random = Math.floor(Math.random() * pictures.length);
+    while(random == currentPicture) {
+        random = Math.floor(Math.random() * pictures.length);
+    }
+    currentPicture = random;
+    const picture = pictures[random];
 
-    const pictureContainer = document.getElementById('landscapeImage');
-    console.log("/images/" + picture);
+    const pictureContainer = document.getElementById("landscapeImage");
     pictureContainer.src = "/images/" + picture;
     
 }
