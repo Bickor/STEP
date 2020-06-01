@@ -12,17 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+var currentPicture = 1;
 /**
- * Adds a random greeting to the page.
+ * Select a random picture.
  */
-function addRandomGreeting() {
-  const greetings =
-      ['Hello world!', '¡Hola Mundo!', '你好，世界！', 'Bonjour le monde!'];
+function randomPicture() {
+    const pictures = ["landscape0.jpg", "landscape1.jpg", "landscape2.jpg",
+        "landscape3.JPG", "landscape4.jpg", "landscape5.jpg", "landscape6.jpg",
+        "landscape7.jpg", "landscape8.jpg", "landscape9.jpg"];
 
-  // Pick a random greeting.
-  const greeting = greetings[Math.floor(Math.random() * greetings.length)];
+    var random = Math.floor(Math.random() * pictures.length);
+    while(random == currentPicture) {
+        random = Math.floor(Math.random() * pictures.length);
+    }
+    currentPicture = random;
+    const picture = pictures[random];
 
-  // Add it to the page.
-  const greetingContainer = document.getElementById('greeting-container');
-  greetingContainer.innerText = greeting;
+    const pictureContainer = document.getElementById("landscapeImage");
+    pictureContainer.src = "/images/" + picture;
+    
 }
