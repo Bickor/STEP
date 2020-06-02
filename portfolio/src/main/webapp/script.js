@@ -32,3 +32,9 @@ function randomPicture() {
     pictureContainer.src = "/images/" + picture;
     
 }
+
+async function sayHello() {
+    const response = await fetch("/data");
+    const data = await response.text();
+    document.getElementById("helloContainer").innerText = data;
+}
