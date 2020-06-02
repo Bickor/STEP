@@ -33,6 +33,9 @@ function randomPicture() {
     
 }
 
+/**
+ * Gets the data and puts it in the portfolio.
+ */
 async function getMessage() {
   const response = await fetch('/data');
   const message = await response.json();

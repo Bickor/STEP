@@ -29,6 +29,9 @@ public class DataServlet extends HttpServlet {
 
   private ArrayList<String> messages;
 
+  /**
+    * Initialize the list with messages.
+    */
   @Override
   public void init() {
       messages = new ArrayList<>();
@@ -47,6 +50,9 @@ public class DataServlet extends HttpServlet {
     return json;
   }
 
+  /**
+    * Function to give content to the fronend.
+    */
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
