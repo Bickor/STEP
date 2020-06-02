@@ -33,8 +33,8 @@ function randomPicture() {
     
 }
 
-async function sayHello() {
-    const response = await fetch("/data");
-    const data = await response.text();
-    document.getElementById("helloContainer").innerText = data;
+async function getMessage() {
+  const response = await fetch('/data');
+  const message = await response.json();
+  document.getElementById('messageContainer').innerText = message[Math.floor(Math.random() * message.length)];
 }
