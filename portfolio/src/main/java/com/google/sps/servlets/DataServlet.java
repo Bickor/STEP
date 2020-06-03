@@ -20,6 +20,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.google.appengine.api.datastore.DatastoreService;
+import com.google.appengine.api.datastore.DatastoreServiceFactory;
+import com.google.appengine.api.datastore.Entity;
+
 import java.util.List;
 import java.util.ArrayList;
 import com.google.gson.Gson;
@@ -44,10 +48,20 @@ public class DataServlet extends HttpServlet {
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
+    
+
       //Get the input from the form.
       String comment = request.getParameter("textInput");
 
-      //Add input to messages array.
+      //Create entity
+      Entity taskEntity = new Entity("Task");
+
+      taskEntity.setProperty("comment", comment);
+      DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+
+      //Add entity to datastore
+      datastore.put(taskEntity);
+
       messages.add(comment);
 
       //Give new information to frontend.
