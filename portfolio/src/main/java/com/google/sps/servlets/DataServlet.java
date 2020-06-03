@@ -27,7 +27,7 @@ import com.google.gson.Gson;
 @WebServlet("/data")
 public class DataServlet extends HttpServlet {
 
-  private ArrayList<String> messages;
+  private List<String> messages;
 
   /**
     * Initialize the list with messages.
@@ -51,7 +51,7 @@ public class DataServlet extends HttpServlet {
   }
 
   /**
-    * Function to give content to the fronend.
+    * Function to give content to the frontend.
     */
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
