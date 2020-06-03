@@ -27,7 +27,7 @@ import com.google.gson.Gson;
 @WebServlet("/data")
 public class DataServlet extends HttpServlet {
 
-  private ArrayList<String> messages;
+  private List<String> messages;
 
   /**
     * Initialize the list with messages.
