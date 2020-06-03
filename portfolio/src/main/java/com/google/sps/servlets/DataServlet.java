@@ -23,6 +23,8 @@ import javax.servlet.http.HttpServletResponse;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.PreparedQuery;
+import com.google.appengine.api.datastore.Query;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -62,8 +64,6 @@ public class DataServlet extends HttpServlet {
       //Add entity to datastore
       datastore.put(taskEntity);
 
-      messages.add(comment);
-
       //Give new information to frontend.
       doGet(request, response);
 
@@ -86,6 +86,22 @@ public class DataServlet extends HttpServlet {
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
+    //TODO: Move into its own function.
+    //Populate the messages array.
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+    Query query = new Query("Task");
+    PreparedQuery results = datastore.prepare(query);
+
+    //Iterate results.
+    for (Entity entity : results.asIterable()) {
+
+        //Only add to array if it doesn't exist already.
+        if (!messages.contains(entity.getProperty("comment").toString())) {
+            messages.add(entity.getProperty("comment").toString());
+        }
+    }
+
+    //Turn array into json.
     String json = convertToJsonUsingGson(messages);
 
     response.setContentType("application/json;");

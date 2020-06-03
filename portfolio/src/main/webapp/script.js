@@ -51,11 +51,18 @@ async function getMessage() {
  * Gets the current messages and displays them as comments.
  */
 async function getCurrentMessages() {
+
+
     const response = await fetch("/data");
     const message = await response.json();
 
     const commentList = document.getElementById("comments");
     
+    //TODO: Only add latest database entry (efficiency).
+    //  So I dont have to delete all of it every time.
+    //Clear everything before it.
+    commentList.innerHTML = "";
+
     //Only display messages if there are any
     if (message != null) {
 
