@@ -37,7 +37,41 @@ function randomPicture() {
  * Gets the data and puts it in the portfolio.
  */
 async function getMessage() {
-  const response = await fetch('/data');
+  const response = await fetch("/data");
   const message = await response.json();
-  document.getElementById('messageContainer').innerText = message[Math.floor(Math.random() * message.length)];
+
+  //Only display messages if there are any.
+  if (message.length != 0) {
+      document.getElementById("messageContainer").innerText = message[Math.floor(Math.random() * message.length)];
+  }
+  
+}
+
+/**
+ * Gets the current messages and displays them as comments.
+ */
+async function getCurrentMessages() {
+    const response = await fetch("/data");
+    const message = await response.json();
+
+    const commentList = document.getElementById("comments");
+    
+    //Only display messages if there are any
+    if (message != null) {
+
+        //Display every message
+        for (i = 0; i < message.length; i++) {
+            commentList.appendChild(createListElement(message[i]));
+        }
+    }
+}
+
+ 
+
+/** Creates an <p> element containing text. */
+function createListElement(text) {
+  const pElement = document.createElement('p');
+  var textNode = document.createTextNode(text);
+  pElement.appendChild(textNode);
+  return pElement;
 }

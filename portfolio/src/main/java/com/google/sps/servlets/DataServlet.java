@@ -36,9 +36,25 @@ public class DataServlet extends HttpServlet {
   @Override
   public void init() {
       messages = new ArrayList<String>();
-      messages.add("Hello, this is Martin!");
-      messages.add("How is your day?");
-      messages.add("Did you learn something new today?");
+  }
+
+  /**
+    * Receive an input from frontend.
+    */
+  @Override
+  public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+
+      //Get the input from the form.
+      String comment = request.getParameter("textInput");
+
+      //Add input to messages array.
+      messages.add(comment);
+
+      //Give new information to frontend.
+      doGet(request, response);
+
+      //Redirect to index.html.
+      response.sendRedirect("/index.html");
   }
   
   /**
