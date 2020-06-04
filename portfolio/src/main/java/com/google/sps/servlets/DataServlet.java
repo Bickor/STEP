@@ -35,13 +35,23 @@ import com.google.gson.Gson;
 public class DataServlet extends HttpServlet {
 
   private List<String> messages;
+  private int count;
 
   /**
     * Initialize the list with messages.
     */
   @Override
   public void init() {
-      messages = new ArrayList<String>();
+      messages = new ArrayList<>();
+
+      // Populate array when initialized.
+      DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+      Query query = new Query("Task");
+      PreparedQuery results = datastore.prepare(query);
+
+      for (Entity entity : results.asIterable()) {
+          messages.add(entity.getProperty("comment").toString());
+      }
   }
 
   /**
@@ -50,24 +60,24 @@ public class DataServlet extends HttpServlet {
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-    
-
-      //Get the input from the form.
+      // Get the input from the form.
       String comment = request.getParameter("textInput");
 
-      //Create entity
+      // Create entity.
       Entity taskEntity = new Entity("Task");
 
       taskEntity.setProperty("comment", comment);
       DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
-      //Add entity to datastore
+      // Add entity to datastore
       datastore.put(taskEntity);
 
-      //Give new information to frontend.
+      messages.add(comment);
+
+      // Give new information to frontend.
       doGet(request, response);
 
-      //Redirect to index.html.
+      // Redirect to index.html.
       response.sendRedirect("/index.html");
   }
   
@@ -85,23 +95,7 @@ public class DataServlet extends HttpServlet {
     */
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-
-    //TODO: Move into its own function.
-    //Populate the messages array.
-    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    Query query = new Query("Task");
-    PreparedQuery results = datastore.prepare(query);
-
-    //Iterate results.
-    for (Entity entity : results.asIterable()) {
-
-        //Only add to array if it doesn't exist already.
-        if (!messages.contains(entity.getProperty("comment").toString())) {
-            messages.add(entity.getProperty("comment").toString());
-        }
-    }
-
-    //Turn array into json.
+    // Turn array into json.
     String json = convertToJsonUsingGson(messages);
 
     response.setContentType("application/json;");
