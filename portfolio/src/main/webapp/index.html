@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="style.css">
     <script src="script.js"></script>
   </head>
-  <body>
+  <body onload="getMessage(); getCurrentMessages();">
         <header>
             <nav>
                 <a class="active" href="/">ABOUT ME</a>
@@ -17,6 +17,7 @@
                 <div class="info">
                     <h1>Martin Heberling's Portfolio</h1>
                     <p>Student and Entrepeneur</p>
+                    <p id="messageContainer"></p>
                 </div>
             </div>
         </header>
@@ -51,6 +52,18 @@
                 <img src="images/linkedin.png" alt="LinkedIn Logo" class="logo">
             </a>
         </div>
+
+        <div>
+            <form action="/data" method="POST">
+                <p> Enter a phrase you comment you would like me to keep!</p>
+                <textarea name="textInput"></textarea>
+                <br></br>
+
+                <input type="submit"/>
+            </form>
+        </div>
+
+        <div id="comments"></div>
 
         <footer>
             <p> © Martin Heberling</p>

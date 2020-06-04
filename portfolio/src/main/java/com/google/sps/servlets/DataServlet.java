@@ -20,13 +20,61 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-/** Servlet that returns some example content. TODO: modify this file to handle comments data */
+import java.util.List;
+import java.util.ArrayList;
+import com.google.gson.Gson;
+
+/** Servlet that returns some example content. */
 @WebServlet("/data")
 public class DataServlet extends HttpServlet {
 
+  private List<String> messages;
+
+  /**
+    * Initialize the list with messages.
+    */
+  @Override
+  public void init() {
+      messages = new ArrayList<String>();
+  }
+
+  /**
+    * Receive an input from frontend.
+    */
+  @Override
+  public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+
+      //Get the input from the form.
+      String comment = request.getParameter("textInput");
+
+      //Add input to messages array.
+      messages.add(comment);
+
+      //Give new information to frontend.
+      doGet(request, response);
+
+      //Redirect to index.html.
+      response.sendRedirect("/index.html");
+  }
+  
+  /**
+   * Converts a List instance into a JSON string using the Gson library.
+   */
+  private String convertToJsonUsingGson(List messages) {
+    Gson gson = new Gson();
+    String json = gson.toJson(messages);
+    return json;
+  }
+
+  /**
+    * Function to give content to the frontend.
+    */
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    response.setContentType("text/html;");
-    response.getWriter().println("<h1>Hello Martin!</h1>");
+
+    String json = convertToJsonUsingGson(messages);
+
+    response.setContentType("application/json;");
+    response.getWriter().println(json);
   }
 }
