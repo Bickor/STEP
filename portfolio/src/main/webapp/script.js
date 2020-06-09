@@ -75,22 +75,55 @@ async function getCurrentMessages() {
  * Creates an <p> element containing text. 
  */
 function createListElement(text) {
-  const pElement = document.createElement('p');
+  const pElement = document.createElement("p");
   var textNode = document.createTextNode(text);
   pElement.appendChild(textNode);
   return pElement;
 }
 
+function createLinkElement(url, loggedIn) {
+    const aElement = document.createElement("a");
+    var link;
+        console.log(isLoggedIn(loggedIn))
+    
+    if (isLoggedIn(loggedIn)) {
+        aElement.title = "Log Out";
+        link = document.createTextNode("Log Out");
+    } else {
+        aElement.title = "Login";
+        link = document.createTextNode("Login");
+    }
+    aElement.appendChild(link);
+    aElement.href = url;
+    return aElement
+}
+
 /**
  * Function to check if the user is logged In.
  */
-async function isUserLoggedIn() {
+async function updateLogin() {
     const response = await fetch("/login");
-    const message = await response.text();
+    const message = await response.json();
 
     const loginItem = document.getElementById("login");
-
+    const comments = document.getElementById("commentsForm");
     loginItem.innerHTML = "";
 
-    loginItem.appendChild(createListElement(message));
+    if (isLoggedIn(message["Loggedin"])) {
+        // Show comments
+        comments.classList.remove("hidden");
+        loginItem.appendChild(createListElement("You are logged in as: " + message["User"]))
+        loginItem.appendChild(createListElement("Log out at: " + message["URL"]));
+        loginItem.appendChild(createLinkElement(message["URL"], message["Loggedin"]));
+    } else {
+        // Hide comments
+        comments.classList.add("hidden");
+        loginItem.appendChild(createListElement("You are not logged in."));
+        loginItem.appendChild(createListElement("Log in at: " + message["URL"]));
+        loginItem.appendChild(createLinkElement(message["URL"], message["Loggedin"]));
+    }
+}
+
+function isLoggedIn(boolean) {
+    return boolean == "True";
 }

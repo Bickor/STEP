@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="style.css">
     <script src="script.js"></script>
   </head>
-  <body onload="getCurrentMessages(); isUserLoggedIn();">
+  <body onload="getCurrentMessages(); updateLogin();">
         <header>
             <nav>
                 <a class="active" href="/">ABOUT ME</a>
@@ -53,9 +53,9 @@
             </a>
         </div>
 
-        <div>
+        <div id="commentsForm" class="hidden">
             <form action="/data" method="POST">
-                <p> Enter a phrase you comment you would like me to keep!</p>
+                <p> Enter a phrase or comment you would like me to keep!</p>
                 <textarea name="textInput"></textarea>
                 <br></br>
 
@@ -63,9 +63,11 @@
             </form>
         </div>
 
+        <div id="login"></div>
+
         <div id="comments"></div>
 
-        <div id="login"></div>
+        
 
         <footer>
             <p> © Martin Heberling</p>
