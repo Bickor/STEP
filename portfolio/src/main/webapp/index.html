@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="style.css">
     <script src="script.js"></script>
   </head>
-  <body onload="getCurrentMessages();">
+  <body onload="getCurrentMessages(); isUserLoggedIn();">
         <header>
             <nav>
                 <a class="active" href="/">ABOUT ME</a>
@@ -64,6 +64,8 @@
         </div>
 
         <div id="comments"></div>
+
+        <div id="login"></div>
 
         <footer>
             <p> © Martin Heberling</p>

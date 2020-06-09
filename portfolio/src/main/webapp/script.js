@@ -69,9 +69,7 @@ async function getCurrentMessages() {
             commentList.appendChild(createListElement(message[i]));
         }
     }
-}
-
- 
+} 
 
 /** 
  * Creates an <p> element containing text. 
@@ -81,4 +79,22 @@ function createListElement(text) {
   var textNode = document.createTextNode(text);
   pElement.appendChild(textNode);
   return pElement;
+}
+
+function createLinkElement(text) {
+    const aElement = document.createElement("a");
+    var textNode = document.createTextNode(text);
+    aElement.appendChild(textNode);
+    return aElement;
+}
+
+async function isUserLoggedIn() {
+    const response = await fetch("/login");
+    const message = await response.text();
+
+    const loginItem = document.getElementById("login");
+
+    loginItem.innerHTML = "";
+
+    loginItem.appendChild(createListElement(message));
 }
