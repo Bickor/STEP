@@ -1,5 +1,8 @@
 package com.google.sps.data;
 
+/**
+ * Class that holds information about a comment.
+ */
 public class Comment {
 
     private String comment;
