@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.ArrayList;
 import com.google.gson.Gson;
 
-/** Servlet that returns some example content. */
+/** Servlet that returns some content. */
 @WebServlet("/data")
 public class DataServlet extends HttpServlet {
 

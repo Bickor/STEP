@@ -81,13 +81,9 @@ function createListElement(text) {
   return pElement;
 }
 
-function createLinkElement(text) {
-    const aElement = document.createElement("a");
-    var textNode = document.createTextNode(text);
-    aElement.appendChild(textNode);
-    return aElement;
-}
-
+/**
+ * Function to check if the user is logged In.
+ */
 async function isUserLoggedIn() {
     const response = await fetch("/login");
     const message = await response.text();
