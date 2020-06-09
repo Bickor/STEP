@@ -66,7 +66,7 @@ async function getCurrentMessages() {
 
         // Display every message
         for (i = 0; i < message.length; i++) {
-            commentList.appendChild(createListElement(message[i]));
+            commentList.appendChild(createListElement(message[i].user + ": " + message[i].comment));
         }
     }
 } 

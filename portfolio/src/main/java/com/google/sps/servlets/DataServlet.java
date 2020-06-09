@@ -26,15 +26,20 @@ import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 
+import com.google.appengine.api.users.UserService;
+import com.google.appengine.api.users.UserServiceFactory;
+
 import java.util.List;
 import java.util.ArrayList;
 import com.google.gson.Gson;
+
+import com.google.sps.data.Comment;
 
 /** Servlet that returns some content. */
 @WebServlet("/data")
 public class DataServlet extends HttpServlet {
 
-  private List<String> messages;
+  private List<Comment> messages;
   private int count;
 
   /**
@@ -50,7 +55,11 @@ public class DataServlet extends HttpServlet {
       PreparedQuery results = datastore.prepare(query);
 
       for (Entity entity : results.asIterable()) {
-          messages.add(entity.getProperty("comment").toString());
+          String comment = entity.getProperty("comment").toString();
+          String useremail = entity.getProperty("userEmail").toString();
+          long timestamp = Long.parseLong(entity.getProperty("timestamp").toString());
+          long keyId = Long.parseLong(entity.getProperty("keyId").toString());
+          messages.add(new Comment(comment, useremail, timestamp, keyId));
       }
   }
 
@@ -63,16 +72,24 @@ public class DataServlet extends HttpServlet {
       // Get the input from the form.
       String comment = request.getParameter("textInput");
 
+      UserService userService = UserServiceFactory.getUserService();      
+
       // Create entity.
-      Entity taskEntity = new Entity("Task");
+      Entity taskEntity = new Entity("Comment");
+
+      long timestamp = System.currentTimeMillis();
 
       taskEntity.setProperty("comment", comment);
+      taskEntity.setProperty("userEmail", userService.getCurrentUser().getEmail());
+      taskEntity.setProperty("timestamp", timestamp);
+      taskEntity.setProperty("keyId", taskEntity.getKey().getId());
+
       DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
       // Add entity to datastore
       datastore.put(taskEntity);
 
-      messages.add(comment);
+      messages.add(new Comment(comment, userService.getCurrentUser().getEmail(), timestamp, taskEntity.getKey().getId()));
 
       // Give new information to frontend.
       doGet(request, response);
