@@ -51,15 +51,15 @@ public class DataServlet extends HttpServlet {
 
       // Populate array when initialized.
       DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-      Query query = new Query("Task");
+      Query query = new Query("Comment");
       PreparedQuery results = datastore.prepare(query);
 
       for (Entity entity : results.asIterable()) {
           String comment = entity.getProperty("comment").toString();
           String useremail = entity.getProperty("userEmail").toString();
           long timestamp = Long.parseLong(entity.getProperty("timestamp").toString());
-          long keyId = Long.parseLong(entity.getProperty("keyId").toString());
-          messages.add(new Comment(comment, useremail, timestamp, keyId));
+          //long keyId = Long.parseLong(entity.getProperty("keyId").toString());
+          messages.add(new Comment(comment, useremail, timestamp));
       }
   }
 
@@ -72,28 +72,31 @@ public class DataServlet extends HttpServlet {
       // Get the input from the form.
       String comment = request.getParameter("textInput");
 
-      UserService userService = UserServiceFactory.getUserService();      
+      UserService userService = UserServiceFactory.getUserService();
+      if (userService.isUserLoggedIn()) {
+            // Create entity.
+            Entity taskEntity = new Entity("Comment");
 
-      // Create entity.
-      Entity taskEntity = new Entity("Comment");
+            long timestamp = System.currentTimeMillis();
 
-      long timestamp = System.currentTimeMillis();
+            taskEntity.setProperty("comment", comment);
+            taskEntity.setProperty("userEmail", userService.getCurrentUser().getEmail());
+            taskEntity.setProperty("timestamp", timestamp);
+            //taskEntity.setProperty("keyId", taskEntity.getKey().getId());
 
-      taskEntity.setProperty("comment", comment);
-      taskEntity.setProperty("userEmail", userService.getCurrentUser().getEmail());
-      taskEntity.setProperty("timestamp", timestamp);
-      taskEntity.setProperty("keyId", taskEntity.getKey().getId());
+            DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
-      DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+            // Add entity to datastore
+            datastore.put(taskEntity);
 
-      // Add entity to datastore
-      datastore.put(taskEntity);
+            messages.add(new Comment(comment, userService.getCurrentUser().getEmail(), timestamp));
 
-      messages.add(new Comment(comment, userService.getCurrentUser().getEmail(), timestamp, taskEntity.getKey().getId()));
-
-      // Give new information to frontend.
-      doGet(request, response);
-
+            // Give new information to frontend.
+            doGet(request, response);
+      } else {
+          // TODO: Make an actual response in the HTML if this happens.
+          response.getWriter.println("You are not logged in.");
+      }
       // Redirect to index.html.
       response.sendRedirect("/index.html");
   }

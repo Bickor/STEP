@@ -87,9 +87,8 @@ function createListElement(text) {
 function createLinkElement(url, loggedIn) {
     const aElement = document.createElement("a");
     var link;
-        console.log(isLoggedIn(loggedIn))
     
-    if (isLoggedIn(loggedIn)) {
+    if (loggedIn) {
         aElement.title = "Log Out";
         link = document.createTextNode("Log Out");
     } else {
@@ -109,24 +108,19 @@ async function updateLogin() {
     const message = await response.json();
 
     const loginItem = document.getElementById("login");
+    const nav = document.getElementById("nav");
     const comments = document.getElementById("commentsForm");
     loginItem.innerHTML = "";
-
-    if (isLoggedIn(message["Loggedin"])) {
-        // Show comments
+    if (message["Loggedin"]) {
+        // Show comment form.
         comments.classList.remove("hidden");
         loginItem.appendChild(createListElement("You are logged in as: " + message["User"]))
-        loginItem.appendChild(createListElement("Log out at: " + message["URL"]));
-        loginItem.appendChild(createLinkElement(message["URL"], message["Loggedin"]));
+        nav.appendChild(createLinkElement(message["URL"], message["Loggedin"]));
     } else {
-        // Hide comments
+        // Hide comment form.
         comments.classList.add("hidden");
+        nav.appendChild(createLinkElement(message["URL"], message["Loggedin"]));
         loginItem.appendChild(createListElement("You are not logged in."));
-        loginItem.appendChild(createListElement("Log in at: " + message["URL"]));
-        loginItem.appendChild(createLinkElement(message["URL"], message["Loggedin"]));
     }
-}
-
-function isLoggedIn(boolean) {
-    return boolean == "True";
+    
 }
