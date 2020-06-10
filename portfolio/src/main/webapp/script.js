@@ -100,7 +100,7 @@ async function updateLogin() {
 
     const loginItem = document.getElementById("login");
     const nav = document.getElementById("nav");
-    const comments = document.getElementById("commentsForm");
+    const comments = document.getElementById("comments-form");
     loginItem.innerHTML = "";
     if (message["Loggedin"]) {
         // Show comment form.

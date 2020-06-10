@@ -9,10 +9,6 @@ body {
   text-align: center;
 }
 
-#greeting-container {
-  margin-top: 20px;
-}
-
 nav {
     display: flex;
     height: 3em;
@@ -64,7 +60,7 @@ footer {
     height: 50%;
 }
 
-.sunsetButton {
+.sunset-button {
     border-radius: 5px;
     background-color: #3399ff;
     color: white;
