@@ -34,20 +34,6 @@ function randomPicture() {
 }
 
 /**
- * Gets the data and puts it in the portfolio.
- */
-async function getMessage() {
-  const response = await fetch("/data");
-  const message = await response.json();
-
-  // Only display messages if there are any.
-  if (message.length != 0) {
-      document.getElementById("messageContainer").innerText = message[Math.floor(Math.random() * message.length)];
-  }
-  
-}
-
-/**
  * Gets the current messages and displays them as comments.
  */
 async function getCurrentMessages() {
@@ -86,7 +72,7 @@ function createListElement(text) {
  */
 function createLinkElement(url, loggedIn) {
     const aElement = document.createElement("a");
-    var link;
+    let link;
     
     if (loggedIn) {
         aElement.title = "Log Out";
@@ -109,7 +95,7 @@ async function updateLogin() {
 
     const loginItem = document.getElementById("login");
     const nav = document.getElementById("nav");
-    const comments = document.getElementById("commentsForm");
+    const comments = document.getElementById("comments-form");
     loginItem.innerHTML = "";
     if (message["Loggedin"]) {
         // Show comment form.

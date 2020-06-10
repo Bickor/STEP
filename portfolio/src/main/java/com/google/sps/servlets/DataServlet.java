@@ -64,11 +64,10 @@ public class DataServlet extends HttpServlet {
             // Add entity to datastore
             datastore.put(taskEntity);
 
+            response.sendRedirect("/index.html");
       } else {
-          response.getWriter().println("You are not logged in.");
+          response.sendError(401);
       }
-      // Redirect to index.html.
-      response.sendRedirect("/index.html");
   }
   
   /**
