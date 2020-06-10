@@ -39,29 +39,7 @@ import com.google.sps.data.Comment;
 @WebServlet("/data")
 public class DataServlet extends HttpServlet {
 
-  private List<Comment> messages;
-  private int count;
-
-  /**
-    * Initialize the list with messages.
-    */
-  @Override
-  public void init() {
-      messages = new ArrayList<>();
-
-      // Populate array when initialized.
-      DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-      Query query = new Query("Comment");
-      PreparedQuery results = datastore.prepare(query);
-
-      for (Entity entity : results.asIterable()) {
-          String comment = entity.getProperty("comment").toString();
-          String useremail = entity.getProperty("userEmail").toString();
-          long timestamp = Long.parseLong(entity.getProperty("timestamp").toString());
-          //long keyId = Long.parseLong(entity.getProperty("keyId").toString());
-          messages.add(new Comment(comment, useremail, timestamp));
-      }
-  }
+    private final DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
   /**
     * Receive an input from frontend.
@@ -82,20 +60,12 @@ public class DataServlet extends HttpServlet {
             taskEntity.setProperty("comment", comment);
             taskEntity.setProperty("userEmail", userService.getCurrentUser().getEmail());
             taskEntity.setProperty("timestamp", timestamp);
-            //taskEntity.setProperty("keyId", taskEntity.getKey().getId());
-
-            DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
             // Add entity to datastore
             datastore.put(taskEntity);
 
-            messages.add(new Comment(comment, userService.getCurrentUser().getEmail(), timestamp));
-
-            // Give new information to frontend.
-            doGet(request, response);
       } else {
-          // TODO: Make an actual response in the HTML if this happens.
-          response.getWriter.println("You are not logged in.");
+          response.getWriter().println("You are not logged in.");
       }
       // Redirect to index.html.
       response.sendRedirect("/index.html");
@@ -115,6 +85,19 @@ public class DataServlet extends HttpServlet {
     */
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    List<Comment> messages = new ArrayList<>();
+
+    // Populate array when initialized.
+    Query query = new Query("Comment");
+    PreparedQuery results = datastore.prepare(query);
+
+    for (Entity entity : results.asIterable()) {
+        String comment = entity.getProperty("comment").toString();
+        String useremail = entity.getProperty("userEmail").toString();
+        long timestamp = Long.parseLong(entity.getProperty("timestamp").toString());
+        messages.add(new Comment(comment, useremail, timestamp));
+    }
+    
     // Turn array into json.
     String json = convertToJsonUsingGson(messages);
 
