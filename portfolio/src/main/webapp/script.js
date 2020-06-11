@@ -34,20 +34,6 @@ function randomPicture() {
 }
 
 /**
- * Gets the data and puts it in the portfolio.
- */
-async function getMessage() {
-  const response = await fetch("/data");
-  const message = await response.json();
-
-  // Only display messages if there are any.
-  if (message.length != 0) {
-      document.getElementById("messageContainer").innerText = message[Math.floor(Math.random() * message.length)];
-  }
-  
-}
-
-/**
  * Gets the current messages and displays them as comments.
  */
 async function getCurrentMessages() {
@@ -66,7 +52,12 @@ async function getCurrentMessages() {
 
         // Display every message
         for (i = 0; i < message.length; i++) {
-            commentList.appendChild(createListElement(message[i].user + ": " + message[i].comment));
+            if (message[i].nickname == "") {
+                commentList.appendChild(createListElement(message[i].user + ": " + message[i].comment));
+            } else {
+                commentList.appendChild(createListElement(message[i].nickname + ": " + message[i].comment));
+            }
+            
         }
     }
 } 
@@ -86,7 +77,7 @@ function createListElement(text) {
  */
 function createLinkElement(url, loggedIn) {
     const aElement = document.createElement("a");
-    var link;
+    let link;
     
     if (loggedIn) {
         aElement.title = "Log Out";
@@ -116,11 +107,30 @@ async function updateLogin() {
         comments.classList.remove("hidden");
         loginItem.appendChild(createListElement("You are logged in as: " + message["User"]))
         nav.appendChild(createLinkElement(message["URL"], message["Loggedin"]));
+        updateNickname(message["Loggedin"]);
     } else {
         // Hide comment form.
         comments.classList.add("hidden");
         nav.appendChild(createLinkElement(message["URL"], message["Loggedin"]));
         loginItem.appendChild(createListElement("You are not logged in."));
     }
-    
+}
+
+async function updateNickname(loggedIn) {
+    if (loggedIn) {
+        const response = await fetch("/nickname");
+        const message = await response.json();
+
+        const loginItem = document.getElementById("login");
+
+        if (message == "") {
+            loginItem.appendChild(createListElement("You don't have a nickname!"));
+            loginItem.appendChild(createLinkElement("/nickname.html", false));
+        } else {
+            loginItem.appendChild(createListElement("Your nickname is: " + message));
+            loginItem.appendChild(createLinkElement("/nickname.html", false));
+        }
+    } else {
+        return;
+    }
 }
