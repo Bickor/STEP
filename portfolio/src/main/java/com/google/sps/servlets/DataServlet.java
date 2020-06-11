@@ -54,22 +54,22 @@ public class DataServlet extends HttpServlet {
 
       UserService userService = UserServiceFactory.getUserService();
       if (userService.isUserLoggedIn()) {
-            // Create entity.
-            Entity taskEntity = new Entity("Comment");
+        // Create entity.
+        Entity taskEntity = new Entity("Comment");
 
-            long timestamp = System.currentTimeMillis();
+        long timestamp = System.currentTimeMillis();
 
-            taskEntity.setProperty("comment", comment);
-            taskEntity.setProperty("userEmail", userService.getCurrentUser().getEmail());
-            taskEntity.setProperty("nickname", getNickname(userService.getCurrentUser().getEmail()));
-            taskEntity.setProperty("userId", userService.getCurrentUser().getUserId());
-            taskEntity.setProperty("timestamp", timestamp);
+        taskEntity.setProperty("comment", comment);
+        taskEntity.setProperty("userEmail", userService.getCurrentUser().getEmail());
+        taskEntity.setProperty("nickname", getNickname(userService.getCurrentUser().getEmail()));
+        taskEntity.setProperty("userId", userService.getCurrentUser().getUserId());
+        taskEntity.setProperty("timestamp", timestamp);
 
-            // Add entity to datastore
-            datastore.put(taskEntity);
+        // Add entity to datastore
+        datastore.put(taskEntity);
 
-            // Redirect to index.html.
-            response.sendRedirect("/index.html");
+        // Redirect to index.html.
+        response.sendRedirect("/index.html");
       } else {
           response.sendError(401);
       }   
