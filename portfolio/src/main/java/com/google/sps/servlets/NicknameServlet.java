@@ -20,7 +20,7 @@ import java.util.HashMap;
 import com.google.gson.Gson;
 
 /**
- * Servlet that holds login information.
+ * Servlet that holds nickname information.
  */
 @WebServlet("/nickname")
 public class NicknameServlet extends HttpServlet {
@@ -31,7 +31,7 @@ public class NicknameServlet extends HttpServlet {
 
       UserService userService = UserServiceFactory.getUserService();
       if (userService.isUserLoggedIn()) {
-          String nickname = getNickname(userService.getCurrentUser().getUserId());
+          String nickname = getNickname(userService.getCurrentUser().getEmail());
           String json = convertToJsonUsingGson(nickname);
           response.getWriter().println(json);
           //response.sendRedirect("/index.html");
@@ -51,21 +51,40 @@ public class NicknameServlet extends HttpServlet {
 
       String nickname = request.getParameter("nickname");
       String id = userService.getCurrentUser().getUserId();
+      String email = userService.getCurrentUser().getEmail();
 
+      // Updates UserInfo database.
       DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-      Entity entity = new Entity("UserInfo", id);
-      entity.setProperty("id", id);
-      entity.setProperty("nickname", nickname);
+      Entity userEntity = new Entity("UserInfo", id);
+      userEntity.setProperty("id", id);
+      userEntity.setProperty("email", email);
+      userEntity.setProperty("nickname", nickname);
 
-      datastore.put(entity);
+      datastore.put(userEntity);
 
+      // Updates comments database with new nickname,
+      Query query = new Query("Comment").setFilter(new Query.FilterPredicate("userId", Query.FilterOperator.EQUAL, id));
+      PreparedQuery results = datastore.prepare(query);
+
+      for (Entity commentEntity : results.asIterable()) {
+          System.out.println(commentEntity.getProperty("userEmail").toString());
+          commentEntity.setProperty("comment", commentEntity.getProperty("comment").toString());
+          commentEntity.setProperty("userEmail", commentEntity.getProperty("userEmail").toString());
+          commentEntity.setProperty("nickname", nickname);
+          commentEntity.setProperty("timestamp", commentEntity.getProperty("timestamp").toString());
+          datastore.put(commentEntity);
+      }
+      
       response.sendRedirect("/index.html");
 
   }
 
-  private String getNickname(String id) {
+  /**
+   * Get the nickname of a user by using the email.
+   */ 
+  private String getNickname(String email) {
       DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-      Query query = new Query("UserInfo").setFilter(new Query.FilterPredicate("id", Query.FilterOperator.EQUAL, id));
+      Query query = new Query("UserInfo").setFilter(new Query.FilterPredicate("email", Query.FilterOperator.EQUAL, email));
       PreparedQuery results = datastore.prepare(query);
       Entity entity = results.asSingleEntity();
       if (entity == null) {

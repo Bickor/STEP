@@ -61,7 +61,8 @@ public class DataServlet extends HttpServlet {
 
             taskEntity.setProperty("comment", comment);
             taskEntity.setProperty("userEmail", userService.getCurrentUser().getEmail());
-            taskEntity.setProperty("nickname", getNickname(userService.getCurrentUser().getUserId()));
+            taskEntity.setProperty("nickname", getNickname(userService.getCurrentUser().getEmail()));
+            taskEntity.setProperty("userId", userService.getCurrentUser().getUserId());
             taskEntity.setProperty("timestamp", timestamp);
 
             // Add entity to datastore
@@ -90,9 +91,11 @@ public class DataServlet extends HttpServlet {
         String useremail = entity.getProperty("userEmail").toString();
         long timestamp = Long.parseLong(entity.getProperty("timestamp").toString());
         try {
+            // If there is a nickname
             String nickname = entity.getProperty("nickname").toString();
             messages.add(new Comment(comment, useremail, nickname, timestamp));
         } catch (NullPointerException e) {
+            // If there is no nickname
             messages.add(new Comment(comment, useremail, "", timestamp));
         }
     }
@@ -104,13 +107,16 @@ public class DataServlet extends HttpServlet {
     response.getWriter().println(json);
   }
 
-  private String getNickname(String id) {
+  /**
+   * Get the nickname of a user by using the email.
+   */ 
+  private String getNickname(String email) {
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    Query query = new Query("UserInfo").setFilter(new Query.FilterPredicate("id", Query.FilterOperator.EQUAL, id));
+    Query query = new Query("UserInfo").setFilter(new Query.FilterPredicate("email", Query.FilterOperator.EQUAL, email));
     PreparedQuery results = datastore.prepare(query);
     Entity entity = results.asSingleEntity();
     if (entity == null) {
-      return "";
+        return "";
     }
     String nickname = (String) entity.getProperty("nickname");
     return nickname;
