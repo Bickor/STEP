@@ -26,33 +26,20 @@ import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 
+import com.google.appengine.api.users.UserService;
+import com.google.appengine.api.users.UserServiceFactory;
+
 import java.util.List;
 import java.util.ArrayList;
 import com.google.gson.Gson;
 
-/** Servlet that returns some example content. */
+import com.google.sps.data.Comment;
+
+/** Servlet that returns some content. */
 @WebServlet("/data")
 public class DataServlet extends HttpServlet {
 
-  private List<String> messages;
-  private int count;
-
-  /**
-    * Initialize the list with messages.
-    */
-  @Override
-  public void init() {
-      messages = new ArrayList<>();
-
-      // Populate array when initialized.
-      DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-      Query query = new Query("Task");
-      PreparedQuery results = datastore.prepare(query);
-
-      for (Entity entity : results.asIterable()) {
-          messages.add(entity.getProperty("comment").toString());
-      }
-  }
+    private final DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
   /**
     * Receive an input from frontend.
@@ -63,22 +50,24 @@ public class DataServlet extends HttpServlet {
       // Get the input from the form.
       String comment = request.getParameter("textInput");
 
-      // Create entity.
-      Entity taskEntity = new Entity("Task");
+      UserService userService = UserServiceFactory.getUserService();
+      if (userService.isUserLoggedIn()) {
+            // Create entity.
+            Entity taskEntity = new Entity("Comment");
 
-      taskEntity.setProperty("comment", comment);
-      DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+            long timestamp = System.currentTimeMillis();
 
-      // Add entity to datastore
-      datastore.put(taskEntity);
+            taskEntity.setProperty("comment", comment);
+            taskEntity.setProperty("userEmail", userService.getCurrentUser().getEmail());
+            taskEntity.setProperty("timestamp", timestamp);
 
-      messages.add(comment);
+            // Add entity to datastore
+            datastore.put(taskEntity);
 
-      // Give new information to frontend.
-      doGet(request, response);
-
-      // Redirect to index.html.
-      response.sendRedirect("/index.html");
+            response.sendRedirect("/index.html");
+      } else {
+          response.sendError(401);
+      }
   }
   
   /**
@@ -95,6 +84,19 @@ public class DataServlet extends HttpServlet {
     */
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    List<Comment> messages = new ArrayList<>();
+
+    // Populate array when initialized.
+    Query query = new Query("Comment");
+    PreparedQuery results = datastore.prepare(query);
+
+    for (Entity entity : results.asIterable()) {
+        String comment = entity.getProperty("comment").toString();
+        String useremail = entity.getProperty("userEmail").toString();
+        long timestamp = Long.parseLong(entity.getProperty("timestamp").toString());
+        messages.add(new Comment(comment, useremail, timestamp));
+    }
+    
     // Turn array into json.
     String json = convertToJsonUsingGson(messages);
 

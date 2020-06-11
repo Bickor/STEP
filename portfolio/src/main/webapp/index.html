@@ -6,9 +6,9 @@
     <link rel="stylesheet" href="style.css">
     <script src="script.js"></script>
   </head>
-  <body onload="getCurrentMessages();">
+  <body onload="getCurrentMessages(); updateLogin();">
         <header>
-            <nav>
+            <nav id="nav">
                 <a class="active" href="/">ABOUT ME</a>
                 <a href="projects.html">PROJECTS</a>
                 <a href="photography.html">PHOTOS</a>
@@ -17,7 +17,6 @@
                 <div class="info">
                     <h1>Martin Heberling's Portfolio</h1>
                     <p>Student and Entrepeneur</p>
-                    <p id="messageContainer"></p>
                 </div>
             </div>
         </header>
@@ -53,15 +52,17 @@
             </a>
         </div>
 
-        <div>
+        <div id="comments-form" class="hidden">
             <form action="/data" method="POST">
-                <p> Enter a phrase you comment you would like me to keep!</p>
+                <p> Enter a phrase or comment you would like me to keep!</p>
                 <textarea name="textInput"></textarea>
                 <br></br>
 
                 <input type="submit"/>
             </form>
         </div>
+
+        <div id="login"></div>
 
         <div id="comments"></div>
 
