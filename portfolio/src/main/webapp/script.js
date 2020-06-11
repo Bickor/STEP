@@ -42,8 +42,6 @@ async function getCurrentMessages() {
 
     const commentList = document.getElementById("comments");
     
-    // TODO: Only add latest database entry (efficiency).
-    // So I dont have to delete all of it every time.
     // Clear everything before it.
     commentList.innerHTML = "";
 
@@ -116,6 +114,9 @@ async function updateLogin() {
     }
 }
 
+/**
+ * Handles the display depending if the user has a nickname.
+ */
 async function updateNickname(loggedIn) {
     if (loggedIn) {
         const response = await fetch("/nickname");
