@@ -20,21 +20,23 @@ import java.util.HashMap;
 import com.google.gson.Gson;
 
 /**
- * Servlet that holds nickname information.
+ * Servlet that holds user information.
  */
-@WebServlet("/nickname")
-public class NicknameServlet extends HttpServlet {
+@WebServlet("/user")
+public class UserServlet extends HttpServlet {
 
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
       response.setContentType("application/json;");
 
+      Map<String, Object> user = new HashMap<>();
+
       UserService userService = UserServiceFactory.getUserService();
       if (userService.isUserLoggedIn()) {
           String nickname = getNickname(userService.getCurrentUser().getEmail());
-          String json = convertToJsonUsingGson(nickname);
+          user.put("nickname", nickname);
+          String json = convertToJsonUsingGson(user);
           response.getWriter().println(json);
-          //response.sendRedirect("/index.html");
       } else {
           response.sendError(401);
       }
@@ -42,10 +44,9 @@ public class NicknameServlet extends HttpServlet {
 
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-
       UserService userService = UserServiceFactory.getUserService();
       if (!userService.isUserLoggedIn()) {
-          response.sendRedirect("/nickname");
+          response.sendError(401);
           return;
       }
 
@@ -76,13 +77,12 @@ public class NicknameServlet extends HttpServlet {
       }
       
       response.sendRedirect("/index.html");
-
   }
 
   /**
    * Get the nickname of a user by using the email.
    */ 
-  private String getNickname(String email) {
+  public static String getNickname(String email) {
       DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
       Query query = new Query("UserInfo").setFilter(new Query.FilterPredicate("email", Query.FilterOperator.EQUAL, email));
       PreparedQuery results = datastore.prepare(query);
@@ -95,9 +95,9 @@ public class NicknameServlet extends HttpServlet {
   }
 
   /**
-  * Converts a List instance into a JSON string using the Gson library.
+  * Converts a Map instance into a JSON string using the Gson library.
   */
-  private static String convertToJsonUsingGson(String messages) {
+  private static String convertToJsonUsingGson(Map messages) {
     Gson gson = new Gson();
     String json = gson.toJson(messages);
     return json;

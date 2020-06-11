@@ -114,16 +114,16 @@ async function updateLogin() {
  */
 async function updateNickname(loggedIn) {
     if (loggedIn) {
-        const response = await fetch("/nickname");
+        const response = await fetch("/user");
         const message = await response.json();
 
         const loginItem = document.getElementById("login");
 
-        if (message == "") {
+        if (message["nickname"] == "") {
             loginItem.appendChild(createListElement("You don't have a nickname!"));
             loginItem.appendChild(createLinkElement("/nickname.html", "Add nickname!"));
         } else {
-            loginItem.appendChild(createListElement("Your nickname is: " + message));
+            loginItem.appendChild(createListElement("Your nickname is: " + message["nickname"]));
             loginItem.appendChild(createLinkElement("/nickname.html", "Change your nickname!"));
         }
     } else {
