@@ -71,7 +71,7 @@ public class DataServlet extends HttpServlet {
         // Redirect to index.html.
         response.sendRedirect("/index.html");
       } else {
-          response.sendError(401);
+        response.sendError(401);
       }
   }
   
