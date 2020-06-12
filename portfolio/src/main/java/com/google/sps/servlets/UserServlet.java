@@ -68,7 +68,6 @@ public class UserServlet extends HttpServlet {
       PreparedQuery results = datastore.prepare(query);
 
       for (Entity commentEntity : results.asIterable()) {
-          System.out.println(commentEntity.getProperty("userEmail").toString());
           commentEntity.setProperty("comment", commentEntity.getProperty("comment").toString());
           commentEntity.setProperty("userEmail", commentEntity.getProperty("userEmail").toString());
           commentEntity.setProperty("nickname", nickname);
