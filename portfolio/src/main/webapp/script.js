@@ -42,8 +42,6 @@ async function getCurrentMessages() {
 
     const commentList = document.getElementById("comments");
     
-    // TODO: Only add latest database entry (efficiency).
-    // So I dont have to delete all of it every time.
     // Clear everything before it.
     commentList.innerHTML = "";
 
@@ -52,7 +50,12 @@ async function getCurrentMessages() {
 
         // Display every message
         for (i = 0; i < message.length; i++) {
-            commentList.appendChild(createListElement(message[i].user + ": " + message[i].comment));
+            if (message[i].nickname == "") {
+                commentList.appendChild(createListElement(message[i].user + ": " + message[i].comment));
+            } else {
+                commentList.appendChild(createListElement(message[i].nickname + ": " + message[i].comment));
+            }
+            
         }
     }
 } 
@@ -70,17 +73,12 @@ function createListElement(text) {
 /**
  * Creates an <a> element containing text.
  */
-function createLinkElement(url, loggedIn) {
+function createLinkElement(url, text) {
     const aElement = document.createElement("a");
     let link;
     
-    if (loggedIn) {
-        aElement.title = "Log Out";
-        link = document.createTextNode("Log Out");
-    } else {
-        aElement.title = "Login";
-        link = document.createTextNode("Login");
-    }
+    aElement.title = text;
+    link = document.createTextNode(text);
     aElement.appendChild(link);
     aElement.href = url;
     return aElement
@@ -101,12 +99,34 @@ async function updateLogin() {
         // Show comment form.
         comments.classList.remove("hidden");
         loginItem.appendChild(createListElement("You are logged in as: " + message["User"]))
-        nav.appendChild(createLinkElement(message["URL"], message["Loggedin"]));
+        nav.appendChild(createLinkElement(message["URL"], "Log Out"));
+        updateNickname(message["Loggedin"]);
     } else {
         // Hide comment form.
         comments.classList.add("hidden");
-        nav.appendChild(createLinkElement(message["URL"], message["Loggedin"]));
+        nav.appendChild(createLinkElement(message["URL"], "Login"));
         loginItem.appendChild(createListElement("You are not logged in."));
     }
-    
+}
+
+/**
+ * Handles the display depending if the user has a nickname.
+ */
+async function updateNickname(loggedIn) {
+    if (loggedIn) {
+        const response = await fetch("/user");
+        const message = await response.json();
+
+        const loginItem = document.getElementById("login");
+
+        if (message["nickname"] == "") {
+            loginItem.appendChild(createListElement("You don't have a nickname!"));
+            loginItem.appendChild(createLinkElement("/nickname.html", "Add nickname!"));
+        } else {
+            loginItem.appendChild(createListElement("Your nickname is: " + message["nickname"]));
+            loginItem.appendChild(createLinkElement("/nickname.html", "Change your nickname!"));
+        }
+    } else {
+        return;
+    }
 }

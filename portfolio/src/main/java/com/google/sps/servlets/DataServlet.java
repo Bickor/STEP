@@ -25,6 +25,8 @@ import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
+import com.google.appengine.api.users.UserService;
+import com.google.appengine.api.users.UserServiceFactory;
 
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
@@ -52,33 +54,27 @@ public class DataServlet extends HttpServlet {
 
       UserService userService = UserServiceFactory.getUserService();
       if (userService.isUserLoggedIn()) {
-            // Create entity.
-            Entity taskEntity = new Entity("Comment");
+        // Create entity.
+        Entity taskEntity = new Entity("Comment");
 
-            long timestamp = System.currentTimeMillis();
+        long timestamp = System.currentTimeMillis();
 
-            taskEntity.setProperty("comment", comment);
-            taskEntity.setProperty("userEmail", userService.getCurrentUser().getEmail());
-            taskEntity.setProperty("timestamp", timestamp);
+        taskEntity.setProperty("comment", comment);
+        taskEntity.setProperty("userEmail", userService.getCurrentUser().getEmail());
+        taskEntity.setProperty("nickname", UserServlet.getNickname(userService.getCurrentUser().getEmail()));
+        taskEntity.setProperty("userId", userService.getCurrentUser().getUserId());
+        taskEntity.setProperty("timestamp", timestamp);
 
-            // Add entity to datastore
-            datastore.put(taskEntity);
+        // Add entity to datastore
+        datastore.put(taskEntity);
 
-            response.sendRedirect("/index.html");
+        // Redirect to index.html.
+        response.sendRedirect("/index.html");
       } else {
-          response.sendError(401);
+        response.sendError(401);
       }
   }
   
-  /**
-   * Converts a List instance into a JSON string using the Gson library.
-   */
-  private String convertToJsonUsingGson(List messages) {
-    Gson gson = new Gson();
-    String json = gson.toJson(messages);
-    return json;
-  }
-
   /**
     * Function to give content to the frontend.
     */
@@ -94,7 +90,13 @@ public class DataServlet extends HttpServlet {
         String comment = entity.getProperty("comment").toString();
         String useremail = entity.getProperty("userEmail").toString();
         long timestamp = Long.parseLong(entity.getProperty("timestamp").toString());
-        messages.add(new Comment(comment, useremail, timestamp));
+        System.out.println(entity.getProperty("nickname"));
+        if (entity.getProperty("nickname") == null) {
+            messages.add(new Comment(comment, useremail, "", timestamp));
+        } else {
+            String nickname = entity.getProperty("nickname").toString();
+            messages.add(new Comment(comment, useremail, nickname, timestamp));
+        }
     }
     
     // Turn array into json.
@@ -103,4 +105,14 @@ public class DataServlet extends HttpServlet {
     response.setContentType("application/json;");
     response.getWriter().println(json);
   }
+
+  /**
+  * Converts a List instance into a JSON string using the Gson library.
+  */
+  private String convertToJsonUsingGson(List messages) {
+    Gson gson = new Gson();
+    String json = gson.toJson(messages);
+    return json;
+  }
+
 }
