@@ -3,10 +3,11 @@
   <head>
     <meta charset="UTF-8">
     <title>My Portfolio</title>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBzVmoVdVQAX2A9hwpQ_aiYWi8nPgTMT0o"></script>
     <link rel="stylesheet" href="style.css">
     <script src="script.js"></script>
   </head>
-  <body>
+  <body onload="createMap();">
         <nav>
             <a href="index.html">ABOUT ME</a>
             <a href="projects.html">PROJECTS</a>
@@ -23,6 +24,9 @@
             <div id="picture-container">
                 <img src="/images/Landscape1.jpg" alt="landscape" id="landscapeImage">
             </div>
+
+            <div id="map"></div>
+
         </div>
         <footer>
             <p> © Martin Heberling</p>

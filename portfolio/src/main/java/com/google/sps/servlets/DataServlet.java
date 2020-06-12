@@ -90,7 +90,6 @@ public class DataServlet extends HttpServlet {
         String comment = entity.getProperty("comment").toString();
         String useremail = entity.getProperty("userEmail").toString();
         long timestamp = Long.parseLong(entity.getProperty("timestamp").toString());
-        System.out.println(entity.getProperty("nickname"));
         if (entity.getProperty("nickname") == null) {
             messages.add(new Comment(comment, useremail, "", timestamp));
         } else {
