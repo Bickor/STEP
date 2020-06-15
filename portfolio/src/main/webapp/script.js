@@ -135,7 +135,78 @@ async function updateNickname(loggedIn) {
  * Creates a map and adds it to the page.
  */
 function createMap() {
-  const map = new google.maps.Map(
+    let montevideo = {lat: -34.895637, lng: -56.108001};
+    let pde = {lat: -34.947961, lng: -54.940787};
+    let pedrera = {lat: -34.585477, lng: -54.119797};
+    let paraguay = {lat: -25.294081, lng: -57.579983};
+    let lanier = {lat: 34.429609, lng: -82.795755};
+
+    const map = new google.maps.Map(
       document.getElementById('map'),
-      {center: {lat: 37.422, lng: -122.084}, zoom: 16});
+      {center: montevideo, zoom: 3});
+
+    let montevideoMarker = new google.maps.Marker({position: montevideo, map: map, title: "Montevideo"});
+    let pdeMarker = new google.maps.Marker({position: pde, map: map, title: "Punta del Este"});
+    let pedreraMarker = new google.maps.Marker({position: pedrera, map: map, title: "La Pedrera"});
+    let paraguayMarker = new google.maps.Marker({position: paraguay, map: map, title: "Paraguay"});
+    let lanierMarker = new google.maps.Marker({position: lanier, map: map, title: "Lake Lanier"});
+
+    let montevideoInfo = new google.maps.InfoWindow({
+        content: createMarkerText("Montevideo", "This is the 'rambla' a place that separates the city from the " +
+        "beach, and it has beautiful views at all times. I used to pass here during my commute to work.")
+    });
+    montevideoMarker.addListener('click', function() {
+        montevideoInfo.open(map, montevideoMarker);
+    });
+
+    let pdeInfo = new google.maps.InfoWindow({
+        content: createMarkerText("Punta del Este", "This is the famous beach and holiday place in Uruguay. " +
+        "You can see the sunrises and sunsets every day from the beach and they are one of the most astouning " +
+        "and beautiful things to see during your time there.")
+    });
+    pdeMarker.addListener('click', function() {
+        pdeInfo.open(map, pdeMarker);
+    });
+
+    let pedreraInfo = new google.maps.InfoWindow({
+        content: createMarkerText("La Pedrera", "The beach here is amazing and filled with great views. " +
+        "It is typically filled with young people who go to enjoy time with friends after new year's")
+    });
+    pedreraMarker.addListener('click', function() {
+        pedreraInfo.open(map, pedreraMarker);
+    });
+
+    let paraguayInfo = new google.maps.InfoWindow({
+        content: createMarkerText("Paraguay", "There are high places where you can have a 360 view of the " +
+        "entire city and an unrivaled view of the sunsets, creating a majestic scenery for everyone watching.")
+    });
+    paraguayMarker.addListener('click', function() {
+        paraguayInfo.open(map, paraguayMarker);
+    });
+
+    let lanierInfo = new google.maps.InfoWindow({
+        content: createMarkerText("Lake Lanier", "I went there with some friends the this year, and being " +
+        "able to be in such a peaceful place with such great views and surrounded by good friends was one " +
+        "the best experiences.")
+    });
+    lanierMarker.addListener('click', function() {
+        lanierInfo.open(map, lanierMarker);
+    });
+
+}
+
+/**
+ * Creates text for the map markers.
+ */
+function createMarkerText(place, text) {
+    let content = "<div id='content'>" +
+    "<div id='siteNotice'>" +
+    "</div>" +
+    "<h1 id='firstHeading' class='firstHeading'>" + place + "</h1>" +
+    "<div id='bodyContent'>" +
+    "<p><b>" + place + "</b>: " + text + "</p>" + 
+    "</div>" +
+    "</div>";
+
+    return content;
 }
