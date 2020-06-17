@@ -13,6 +13,8 @@
 // limitations under the License.
 
 var currentPicture = 1;
+let editMarker;
+let map;
 /**
  * Select a random picture.
  */
@@ -135,7 +137,147 @@ async function updateNickname(loggedIn) {
  * Creates a map and adds it to the page.
  */
 function createMap() {
-  const map = new google.maps.Map(
+    let montevideo = {lat: -34.895637, lng: -56.108001};
+    let pde = {lat: -34.947961, lng: -54.940787};
+    let pedrera = {lat: -34.585477, lng: -54.119797};
+    let paraguay = {lat: -25.294081, lng: -57.579983};
+    let lanier = {lat: 34.429609, lng: -82.795755};
+
+    map = new google.maps.Map(
       document.getElementById('map'),
-      {center: {lat: 37.422, lng: -122.084}, zoom: 16});
+      {center: montevideo, zoom: 3});
+
+    let montevideoMarker = new google.maps.Marker({position: montevideo, map: map, title: "Montevideo"});
+    let pdeMarker = new google.maps.Marker({position: pde, map: map, title: "Punta del Este"});
+    let pedreraMarker = new google.maps.Marker({position: pedrera, map: map, title: "La Pedrera"});
+    let paraguayMarker = new google.maps.Marker({position: paraguay, map: map, title: "Paraguay"});
+    let lanierMarker = new google.maps.Marker({position: lanier, map: map, title: "Lake Lanier"});
+
+    createMarkerInformation(montevideoMarker, "Montevideo", "This is the 'rambla' a place that separates the city from the " +
+        "beach, and it has beautiful views at all times. I used to pass here during my commute to work.");
+    
+    createMarkerInformation(pdeMarker, "Punta del Este", "This is the famous beach and holiday place in Uruguay. " +
+        "You can see the sunrises and sunsets every day from the beach and they are one of the most astouning " +
+        "and beautiful things to see during your time there.");
+
+    createMarkerInformation(pedreraMarker, "La Pedrera", "The beach here is amazing and filled with great views. " +
+        "It is typically filled with young people who go to enjoy time with friends after new year's.");
+    
+    createMarkerInformation(paraguayMarker, "Paraguay", "There are high places where you can have a 360 view of the " +
+        "entire city and an unrivaled view of the sunsets, creating a majestic scenery for everyone watching.");
+    
+    createMarkerInformation(lanierMarker, "Lake Lanier", "I went there with some friends the this year, and being " +
+        "able to be in such a peaceful place with such great views and surrounded by good friends was one " +
+        "the best experiences.");
+    map.addListener("click", event => {
+        markerEditor(event.latLng.lat(), event.latLng.lng());
+    });
+
+    fetchMarkers();
+}
+
+function createMarkerInformation(marker, place, text) {
+    let info = new google.maps.InfoWindow({
+        content: markerText(place, text)
+    });
+    marker.addListener("click", function() {
+        info.open(map, marker);
+    })
+}
+
+/**
+ * Creates text for the map markers.
+ */
+function markerText(place, text) {
+    let div = document.createElement("div");
+    let pText = document.createElement("p");
+    let hText = document.createElement("h1");
+
+    hText.appendChild(document.createTextNode(place));
+    pText.appendChild(document.createTextNode(text));
+    div.appendChild(hText);
+    div.appendChild(pText);
+    return div;
+}
+
+/**
+ * Gets markers from the database.
+ */
+async function fetchMarkers() {
+    let request = await fetch("/markers");
+    let response = await request.json();
+    response.forEach(
+        marker => {
+            createShowMarker(marker.lat, marker.lng, marker.content);
+        }
+    )
+}
+
+/**
+ * Creates a marker.
+ */
+function createShowMarker(lat, lng, content) {
+    const marker = new google.maps.Marker({position: {lat: lat, lng: lng}, map: map});
+
+    const infoWindow = new google.maps.InfoWindow({content: content});
+    marker.addListener("click", function () {
+        infoWindow.open(map, marker);
+    })
+}
+
+/**
+ * Send new marker to the database.
+ */
+function postMarker(lat, lng, content) {
+    const params = new URLSearchParams();
+    params.append("lat", lat);
+    params.append("lng", lng);
+    params.append("content", content);
+
+    fetch("/markers", {
+        method: "POST",
+        body: params
+    });
+}
+
+/**
+ * Shows info about marker that is being editer and then submitted to the database.
+ */
+function markerEditor(lat, lng) {
+    if (editMarker) {
+        editMarker.setMap(null);
+    }
+
+    editMarker = new google.maps.Marker({position: {lat: lat, lng: lng}, map: map});
+
+    const infoWindow = new google.maps.InfoWindow({content: buildInfoWindowInput(lat, lng)});
+
+    google.maps.event.addListener(infoWindow, "closeclick",  () => {
+        editMarker.setMap(null);
+    });
+
+    infoWindow.open(map, editMarker);
+}
+
+/**
+ * Shows the textbox and submit button for the marker being created.
+ */
+function buildInfoWindowInput(lat, lng) {
+    const textBox = document.createElement("textarea");
+    const button = document.createElement("button");
+    button.appendChild(document.createTextNode("Submit"));
+
+    button.onclick = () => {
+        postMarker(lat, lng, textBox.value);
+        createShowMarker(lat, lng, textBox.value);
+        
+        editMarker.setMap(null);
+    };
+
+    const containerDiv = document.createElement("div");
+    containerDiv.appendChild(textBox);
+    containerDiv.appendChild(document.createElement("br"));
+    containerDiv.appendChild(button);
+
+    return containerDiv;
 }
