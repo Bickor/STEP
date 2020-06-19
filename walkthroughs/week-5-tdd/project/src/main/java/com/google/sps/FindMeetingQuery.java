@@ -24,35 +24,48 @@ public final class FindMeetingQuery {
   public Collection<TimeRange> query(Collection<Event> events, MeetingRequest request) {
     Collection<TimeRange> possibilities;
     Collection<String> attendees = request.getAttendees();
-    Collection<String> optionalAttendees = request.getOptionalAttendees();
 
+    // If the requested time is longer than the entire day.
     if (request.getDuration() > TimeRange.WHOLE_DAY.duration()) {
         possibilities = Arrays.asList();
         return possibilities;
     }
 
-    if ((request.getDuration() < TimeRange.WHOLE_DAY.duration() && request.getAttendees().isEmpty()) || events.isEmpty()) {
+    // If there are no attendees or there are no events during the day.
+    if (request.getAttendees().isEmpty() || events.isEmpty()) {
         possibilities = Arrays.asList(TimeRange.WHOLE_DAY);
         return possibilities;
     }
 
     List<TimeRange> eventsAL = new ArrayList<>();
     possibilities = new ArrayList<>();
+
+    // Add events that share attendees.
     for (Event event : events) {
         if (!Collections.disjoint(event.getAttendees(), attendees)) {
             eventsAL.add(event.getWhen());
         }
     }
 
+    // Check if one event contains another.
+    for (int i = 0; i < eventsAL.size() - 1; i++) {
+        if (eventsAL.get(i).contains(eventsAL.get(i + 1))) {
+            eventsAL.remove(eventsAL.get(i + 1));
+        }
+    }
+
     List<TimeRange> openSpaces = openSlots(eventsAL);
-    System.out.println(openSpaces);
+
 
     for (int i = 0; i < openSpaces.size(); i++) {
+
+        // If its only one free space during the day and it's the entire day.
         if (openSpaces.size() == 1 && openSpaces.get(i).duration() == TimeRange.WHOLE_DAY.duration() - 1) {
             possibilities.add(TimeRange.fromStartEnd(0, TimeRange.WHOLE_DAY.duration(), false));
             return possibilities;
         }
 
+        // If the duration of the free space is longer or equal to the requested duration.
         if (openSpaces.get(i).duration() >= request.getDuration()) {
             possibilities.add(TimeRange.fromStartEnd(openSpaces.get(i).start(), openSpaces.get(i).end(), false));
         }
@@ -65,7 +78,6 @@ public final class FindMeetingQuery {
    * Get the free slots on the day.
    */
   public List<TimeRange> openSlots(List<TimeRange> events) {
-      System.out.println(events);
       List<TimeRange> possibilities;
 
       // If there are no events.
