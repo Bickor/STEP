@@ -62,6 +62,4 @@ public class MarkerServlet extends HttpServlet {
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
         datastore.put(markerEntity);
     }
-
-
 }
