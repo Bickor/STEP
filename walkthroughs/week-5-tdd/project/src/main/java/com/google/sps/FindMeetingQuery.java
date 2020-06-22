@@ -22,28 +22,32 @@ import java.util.Collections;
 
 public final class FindMeetingQuery {
   public Collection<TimeRange> query(Collection<Event> events, MeetingRequest request) {
-    Collection<TimeRange> possibilities;
     Collection<String> attendees = request.getAttendees();
 
     // If the requested time is longer than the entire day.
     if (request.getDuration() > TimeRange.WHOLE_DAY.duration()) {
-        possibilities = Arrays.asList();
-        return possibilities;
+        return Arrays.asList();
+    }
+
+    if (attendees.isEmpty() && !request.getOptionalAttendees().isEmpty()) {
+        attendees = request.getOptionalAttendees();
     }
 
     // If there are no attendees or there are no events during the day.
-    if (request.getAttendees().isEmpty() || events.isEmpty()) {
-        possibilities = Arrays.asList(TimeRange.WHOLE_DAY);
-        return possibilities;
+    if (attendees.isEmpty() || events.isEmpty()) {
+        return Arrays.asList(TimeRange.WHOLE_DAY);
     }
 
+    // Attending list & Optional list
     List<TimeRange> eventsAL = new ArrayList<>();
-    possibilities = new ArrayList<>();
+    List<TimeRange> eventsOL = new ArrayList<>();
 
     // Add events that share attendees.
     for (Event event : events) {
         if (!Collections.disjoint(event.getAttendees(), attendees)) {
             eventsAL.add(event.getWhen());
+        } else if (!Collections.disjoint(event.getAttendees(), request.getOptionalAttendees())) {
+            eventsOL.add(event.getWhen());
         }
     }
 
@@ -55,7 +59,7 @@ public final class FindMeetingQuery {
     }
 
     List<TimeRange> openSpaces = openSlots(eventsAL);
-
+    Collection<TimeRange> possibilities = new ArrayList<>();
 
     for (int i = 0; i < openSpaces.size(); i++) {
 
@@ -71,6 +75,17 @@ public final class FindMeetingQuery {
         }
     }
 
+    // If possible add the optional attendees.
+    if (possibilities.size() > 1) {
+        for (TimeRange timeAL : possibilities) {
+            for (TimeRange timeOL : eventsOL) {
+                if (timeAL.equals(timeOL)) {
+                    possibilities.remove(timeAL);
+                }
+            }
+        }
+    }
+
     return possibilities;
   }
 
@@ -78,14 +93,13 @@ public final class FindMeetingQuery {
    * Get the free slots on the day.
    */
   public List<TimeRange> openSlots(List<TimeRange> events) {
-      List<TimeRange> possibilities;
-
+      
       // If there are no events.
       if (events.isEmpty()) {
           return Arrays.asList(TimeRange.fromStartEnd(TimeRange.START_OF_DAY, TimeRange.END_OF_DAY, false));
       }
 
-      possibilities = new ArrayList<>();
+      List<TimeRange> possibilities = new ArrayList<>();
 
       // Get first event
       if (events.get(0).start() > TimeRange.START_OF_DAY) {

@@ -23,7 +23,7 @@ public class Greeter {
    */
   public String greet(String name) {
     name = name.trim();
-    name = name.replaceAll("[^A-Za-z0-9]","");
+    name = name.replaceAll("[^\\p{IsAlphabetic}\\p{IsDigit}]", "");
     return "Hello " + name;
   }
 }
