@@ -62,13 +62,6 @@ public final class FindMeetingQuery {
     Collection<TimeRange> possibilities = new ArrayList<>();
 
     for (int i = 0; i < openSpaces.size(); i++) {
-
-        // If its only one free space during the day and it's the entire day.
-        if (openSpaces.size() == 1 && openSpaces.get(i).duration() == TimeRange.WHOLE_DAY.duration() - 1) {
-            possibilities.add(TimeRange.fromStartEnd(0, TimeRange.WHOLE_DAY.duration(), false));
-            return possibilities;
-        }
-
         // If the duration of the free space is longer or equal to the requested duration.
         if (openSpaces.get(i).duration() >= request.getDuration()) {
             possibilities.add(TimeRange.fromStartEnd(openSpaces.get(i).start(), openSpaces.get(i).end(), false));
@@ -93,10 +86,9 @@ public final class FindMeetingQuery {
    * Get the free slots on the day.
    */
   public List<TimeRange> openSlots(List<TimeRange> events) {
-      
       // If there are no events.
       if (events.isEmpty()) {
-          return Arrays.asList(TimeRange.fromStartEnd(TimeRange.START_OF_DAY, TimeRange.END_OF_DAY, false));
+          return Arrays.asList(TimeRange.fromStartEnd(TimeRange.START_OF_DAY, TimeRange.END_OF_DAY, true));
       }
 
       List<TimeRange> possibilities = new ArrayList<>();
